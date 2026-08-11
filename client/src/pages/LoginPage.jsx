@@ -12,10 +12,8 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  // Initialize Google Sign-In SDK for Student Login
+  // Initialize Google Sign-In SDK for Student & Admin Login
   useEffect(() => {
-    if (activeRoleTab !== 'student') return;
-
     const setupGoogleSDK = () => {
       if (window.google?.accounts?.id) {
         try {
@@ -25,7 +23,7 @@ export default function LoginPage() {
               if (response.credential) {
                 setSubmitting(true);
                 setError('');
-                const res = await loginWithGoogle(response.credential);
+                const res = await loginWithGoogle(response.credential, null, activeRoleTab);
                 setSubmitting(false);
                 if (!res.success) {
                   setError(res.message);
@@ -34,11 +32,12 @@ export default function LoginPage() {
             }
           });
 
-          const btnContainer = document.getElementById('google-btn-container');
+          const btnContainerId = activeRoleTab === 'student' ? 'google-btn-container-student' : 'google-btn-container-admin';
+          const btnContainer = document.getElementById(btnContainerId);
           if (btnContainer) {
             btnContainer.innerHTML = '';
             window.google.accounts.id.renderButton(btnContainer, {
-              theme: 'filled_blue',
+              theme: activeRoleTab === 'admin' ? 'filled_black' : 'filled_blue',
               size: 'large',
               type: 'standard',
               shape: 'rectangular',
@@ -187,68 +186,88 @@ export default function LoginPage() {
                 </p>
               </div>
 
-
-
               {/* Official Google Sign-In Button Wrapper */}
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.5rem', minHeight: '44px' }}>
-                <div id="google-btn-container" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}></div>
+                <div id="google-btn-container-student" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}></div>
               </div>
             </div>
           ) : (
-            /* Admin Tab: Password Authentication */
-            <form onSubmit={handleAdminSubmit}>
-              <div className="form-group">
-                <label>Admin Email / Roll No</label>
-                <div style={{ position: 'relative' }}>
-                  <input
-                    type="text"
-                    className="input-control"
-                    style={{ width: '100%', paddingLeft: '2.5rem' }}
-                    placeholder="admin or admin@college.edu"
-                    value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
-                    required
-                  />
-                  <Mail
-                    size={18}
-                    style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }}
-                  />
-                </div>
+            /* Admin Tab: Google OAuth + Password Authentication */
+            <div>
+              <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+                <p style={{ fontSize: '0.92rem', color: 'var(--text-main)', fontWeight: 600, marginBottom: '0.25rem' }}>
+                  Admin Sign-In
+                </p>
+                <p style={{ fontSize: '0.83rem', color: 'var(--text-muted)' }}>
+                  Sign in with your Admin Google Account or Credentials
+                </p>
               </div>
 
-              <div className="form-group">
-                <label>Password</label>
-                <div style={{ position: 'relative' }}>
-                  <input
-                    type="password"
-                    className="input-control"
-                    style={{ width: '100%', paddingLeft: '2.5rem' }}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <Lock
-                    size={18}
-                    style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }}
-                  />
-                </div>
+              {/* Official Google Sign-In Button Wrapper for Admin */}
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem', minHeight: '44px' }}>
+                <div id="google-btn-container-admin" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}></div>
               </div>
 
-              <button
-                type="submit"
-                className="btn-primary"
-                style={{
-                  width: '100%',
-                  marginTop: '1rem',
-                  background: 'linear-gradient(135deg, #f59e0b, #d97706)'
-                }}
-                disabled={submitting}
-              >
-                <span>{submitting ? 'Authenticating...' : 'Login as Admin'}</span>
-                <ArrowRight size={18} />
-              </button>
-            </form>
+              <div style={{ display: 'flex', alignItems: 'center', margin: '1.25rem 0', color: 'var(--text-dim)', fontSize: '0.8rem' }}>
+                <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }}></div>
+                <span style={{ padding: '0 0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>OR PASSWORD LOGIN</span>
+                <div style={{ flex: 1, height: '1px', background: 'var(--border-color)' }}></div>
+              </div>
+
+              <form onSubmit={handleAdminSubmit}>
+                <div className="form-group">
+                  <label>Admin Email / Roll No</label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="text"
+                      className="input-control"
+                      style={{ width: '100%', paddingLeft: '2.5rem' }}
+                      placeholder="admin or admin@college.edu"
+                      value={identifier}
+                      onChange={(e) => setIdentifier(e.target.value)}
+                      required
+                    />
+                    <Mail
+                      size={18}
+                      style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Password</label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type="password"
+                      className="input-control"
+                      style={{ width: '100%', paddingLeft: '2.5rem' }}
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                    <Lock
+                      size={18}
+                      style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  style={{
+                    width: '100%',
+                    marginTop: '1rem',
+                    background: 'linear-gradient(135deg, #f59e0b, #d97706)'
+                  }}
+                  disabled={submitting}
+                >
+                  <span>{submitting ? 'Authenticating...' : 'Login as Admin'}</span>
+                  <ArrowRight size={18} />
+                </button>
+              </form>
+            </div>
           )}
         </div>
       </div>

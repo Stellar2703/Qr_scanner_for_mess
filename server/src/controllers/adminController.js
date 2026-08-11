@@ -103,10 +103,33 @@ async function createStudent(req, res) {
   }
 }
 
+async function deleteStudent(req, res) {
+  try {
+    const studentId = req.params.id;
+    if (!studentId) {
+      return res.status(400).json({ success: false, message: 'Student ID is required.' });
+    }
+
+    const deleted = await db.deleteStudent(studentId);
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: 'Student not found or already deleted.' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Student record and attendance history deleted successfully.'
+    });
+  } catch (err) {
+    console.error('Error deleting student:', err);
+    res.status(500).json({ success: false, message: 'Failed to delete student record.' });
+  }
+}
+
 module.exports = {
   getDashboard,
   getLogs,
   getStudentsList,
   resetDemoData,
-  createStudent
+  createStudent,
+  deleteStudent
 };

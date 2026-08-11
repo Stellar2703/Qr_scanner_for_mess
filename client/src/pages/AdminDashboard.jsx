@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import StatCard from '../components/StatCard';
-import { Users, UserCheck, UserX, Percent, RefreshCw, Calendar, ArrowRight, ScanLine, RotateCcw, AlertCircle, UserPlus, QrCode, X, CheckCircle } from 'lucide-react';
+import { Users, UserCheck, UserX, Percent, RefreshCw, Calendar, ArrowRight, ScanLine, RotateCcw, AlertCircle, UserPlus, QrCode, X, CheckCircle, Trash2, Search, Mail } from 'lucide-react';
 
 export default function AdminDashboard({ onNavigate }) {
   const [stats, setStats] = useState(null);
@@ -9,6 +9,11 @@ export default function AdminDashboard({ onNavigate }) {
   const [error, setError] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [resetMessage, setResetMessage] = useState('');
+
+  // Student directory state
+  const [students, setStudents] = useState([]);
+  const [studentsLoading, setStudentsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Add student state
   const [showAddModal, setShowAddModal] = useState(false);
@@ -22,6 +27,20 @@ export default function AdminDashboard({ onNavigate }) {
   const [addLoading, setAddLoading] = useState(false);
   const [addError, setAddError] = useState('');
   const [createdStudent, setCreatedStudent] = useState(null);
+
+  const fetchStudents = async () => {
+    setStudentsLoading(true);
+    try {
+      const res = await axios.get('/api/admin/students');
+      if (res.data.success) {
+        setStudents(res.data.students);
+      }
+    } catch (err) {
+      console.error('Failed to fetch students list:', err);
+    } finally {
+      setStudentsLoading(false);
+    }
+  };
 
   const fetchDashboardStats = async (dateParam) => {
     setLoading(true);
@@ -41,7 +60,26 @@ export default function AdminDashboard({ onNavigate }) {
 
   useEffect(() => {
     fetchDashboardStats();
+    fetchStudents();
   }, [selectedDate]);
+
+  const handleDeleteStudent = async (studentId, studentName) => {
+    if (!window.confirm(`Are you sure you want to delete student "${studentName}"? This action cannot be undone and will delete all associated scan logs.`)) {
+      return;
+    }
+
+    try {
+      const res = await axios.delete(`/api/admin/students/${studentId}`);
+      if (res.data.success) {
+        setResetMessage(`Student "${studentName}" deleted successfully.`);
+        fetchStudents();
+        fetchDashboardStats();
+        setTimeout(() => setResetMessage(''), 4000);
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to delete student.');
+    }
+  };
 
   const handleAddStudentSubmit = async (e) => {
     e.preventDefault();
@@ -54,6 +92,7 @@ export default function AdminDashboard({ onNavigate }) {
       if (res.data.success) {
         setCreatedStudent(res.data.student);
         fetchDashboardStats();
+        fetchStudents();
         setFormData({
           roll_no: '',
           name: '',
@@ -266,6 +305,163 @@ export default function AdminDashboard({ onNavigate }) {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Registered Students Directory Section */}
+          <div className="glass-card" style={{ marginTop: '2rem', padding: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <h2 style={{ fontSize: '1.2rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Users size={20} className="text-primary" />
+                  <span>Registered Students Directory</span>
+                  <span style={{ fontSize: '0.8rem', background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8', padding: '0.15rem 0.6rem', borderRadius: '1rem', fontWeight: 600 }}>
+                    {students.length} Total
+                  </span>
+                </h2>
+                <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+                  View, add, and delete enrolled students and permanent QR code records
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <div style={{ position: 'relative', minWidth: '240px' }}>
+                  <Search size={16} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
+                  <input
+                    type="text"
+                    className="input-control"
+                    placeholder="Search name, roll no, email..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{ paddingLeft: '2.25rem', fontSize: '0.85rem', height: '38px' }}
+                  />
+                </div>
+
+                <button
+                  className="btn-primary"
+                  style={{ background: 'linear-gradient(135deg, #10b981, #059669)', height: '38px', fontSize: '0.85rem' }}
+                  onClick={() => {
+                    setShowAddModal(true);
+                    setCreatedStudent(null);
+                    setAddError('');
+                  }}
+                >
+                  <UserPlus size={16} />
+                  <span>Add Student</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Students Table */}
+            {studentsLoading ? (
+              <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                <RefreshCw size={24} className="spinner" style={{ animation: 'spin 1s linear infinite' }} />
+                <p style={{ marginTop: '0.5rem', fontSize: '0.85rem' }}>Loading students directory...</p>
+              </div>
+            ) : (
+              (() => {
+                const filteredStudents = students.filter(s =>
+                  s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  s.roll_no.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  s.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  (s.department && s.department.toLowerCase().includes(searchTerm.toLowerCase()))
+                );
+
+                if (filteredStudents.length === 0) {
+                  return (
+                    <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-muted)' }}>
+                      <Users size={32} style={{ margin: '0 auto 0.5rem auto', opacity: 0.4 }} />
+                      <p style={{ fontSize: '0.9rem' }}>No students found matching "{searchTerm}"</p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          <th style={{ padding: '0.75rem 1rem' }}>Roll No</th>
+                          <th style={{ padding: '0.75rem 1rem' }}>Student Name</th>
+                          <th style={{ padding: '0.75rem 1rem' }}>Email / Department</th>
+                          <th style={{ padding: '0.75rem 1rem' }}>Permanent QR Token</th>
+                          <th style={{ padding: '0.75rem 1rem' }}>Today's Status</th>
+                          <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredStudents.map((s) => (
+                          <tr key={s.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)', transition: 'background 0.15s ease' }}>
+                            <td style={{ padding: '0.75rem 1rem', fontWeight: 700, color: 'var(--primary)', fontFamily: 'monospace' }}>
+                              {s.roll_no}
+                            </td>
+                            <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '0.85rem' }}>
+                                  {s.name ? s.name.charAt(0) : 'S'}
+                                </div>
+                                <span>{s.name}</span>
+                              </div>
+                            </td>
+                            <td style={{ padding: '0.75rem 1rem', color: 'var(--text-muted)' }}>
+                              <div>{s.email}</div>
+                              <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>{s.department || 'General'}</div>
+                            </td>
+                            <td style={{ padding: '0.75rem 1rem', fontFamily: 'monospace', fontSize: '0.82rem', color: '#38bdf8' }}>
+                              <span style={{ background: 'rgba(56, 189, 248, 0.1)', padding: '0.2rem 0.5rem', borderRadius: '4px', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
+                                {s.permanent_qr_token ? s.permanent_qr_token.substring(0, 16) + '...' : 'N/A'}
+                              </span>
+                            </td>
+                            <td style={{ padding: '0.75rem 1rem' }}>
+                              {s.isScannedToday ? (
+                                <span className="badge-status approved" style={{ fontSize: '0.75rem' }}>
+                                  PRESENT ({s.scanTime})
+                                </span>
+                              ) : (
+                                <span style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem', borderRadius: '1rem', background: 'rgba(239, 68, 68, 0.15)', color: '#f87171', fontWeight: 600 }}>
+                                  ABSENT
+                                </span>
+                              )}
+                            </td>
+                            <td style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
+                              <button
+                                type="button"
+                                title="Delete Student"
+                                onClick={() => handleDeleteStudent(s.id, s.name)}
+                                style={{
+                                  background: 'rgba(239, 68, 68, 0.15)',
+                                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                                  color: '#f87171',
+                                  padding: '0.4rem 0.75rem',
+                                  borderRadius: 'var(--radius-sm)',
+                                  cursor: 'pointer',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.35rem',
+                                  fontSize: '0.8rem',
+                                  fontWeight: 600,
+                                  transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.background = '#ef4444';
+                                  e.currentTarget.style.color = '#fff';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)';
+                                  e.currentTarget.style.color = '#f87171';
+                                }}
+                              >
+                                <Trash2 size={14} />
+                                <span>Delete</span>
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })()
+            )}
           </div>
         </>
       )}

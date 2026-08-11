@@ -10,6 +10,7 @@ router.get('/dashboard', adminController.getDashboard);
 router.get('/logs', adminController.getLogs);
 router.get('/students', adminController.getStudentsList);
 router.post('/students', adminController.createStudent);
+router.delete('/students/:id', adminController.deleteStudent);
 router.post('/reset-demo', adminController.resetDemoData);
 
 module.exports = router;

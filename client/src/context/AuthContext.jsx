@@ -62,9 +62,9 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const loginWithGoogle = async (credential, email) => {
+  const loginWithGoogle = async (credential, email, expectedRole) => {
     try {
-      const res = await axios.post('/api/auth/google-login', { credential, email });
+      const res = await axios.post('/api/auth/google-login', { credential, email, expectedRole });
       if (res.data.success) {
         const { token: newToken, user: userData } = res.data;
         localStorage.setItem('qr_token', newToken);

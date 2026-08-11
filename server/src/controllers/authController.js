@@ -62,20 +62,21 @@ async function googleLogin(req, res) {
       });
     }
 
-    // Lookup student in DB by email
+    // Lookup user in DB by email
     const user = await db.getUserByEmail(targetEmail);
 
     if (!user) {
       return res.status(403).json({
         success: false,
-        message: `Access denied. The email address (${targetEmail}) is not registered in the student database.`
+        message: `Access denied. The email address (${targetEmail}) is not registered in the system.`
       });
     }
 
-    if (user.role !== 'student') {
+    const { expectedRole } = req.body;
+    if (expectedRole && user.role !== expectedRole) {
       return res.status(403).json({
         success: false,
-        message: `Access denied. ${targetEmail} is registered as an Admin. Please log in via the Admin Portal.`
+        message: `Access denied. ${targetEmail} is registered as ${user.role}, not ${expectedRole}.`
       });
     }
 
@@ -97,7 +98,7 @@ async function googleLogin(req, res) {
 
     res.json({
       success: true,
-      message: 'Student Google OAuth login successful',
+      message: `${user.role === 'admin' ? 'Admin' : 'Student'} Google OAuth login successful`,
       token,
       user: userWithoutPassword
     });

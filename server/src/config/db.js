@@ -297,6 +297,13 @@ const db = {
     return true;
   },
 
+  // Delete student and associated logs
+  async deleteStudent(studentId) {
+    await pool.query('DELETE FROM attendance_logs WHERE student_id = ?', [studentId]);
+    const [result] = await pool.query('DELETE FROM users WHERE id = ? AND role = "student"', [studentId]);
+    return result.affectedRows > 0;
+  },
+
   // Admin Analytics & Dashboard Data
   async getAdminDashboardStats(targetDate = getTodayString()) {
     const students = await this.getAllStudents();
