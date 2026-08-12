@@ -36,6 +36,8 @@ export default function LoginPage() {
           const btnContainer = document.getElementById(btnContainerId);
           if (btnContainer) {
             btnContainer.innerHTML = '';
+            // Dynamically calculate width for mobile viewports (min 240px, max 380px)
+            const targetWidth = Math.min(380, Math.max(240, (btnContainer.parentElement?.clientWidth || window.innerWidth) - 32));
             window.google.accounts.id.renderButton(btnContainer, {
               theme: activeRoleTab === 'admin' ? 'filled_black' : 'filled_blue',
               size: 'large',
@@ -43,7 +45,7 @@ export default function LoginPage() {
               shape: 'rectangular',
               text: 'signin_with',
               logo_alignment: 'left',
-              width: 380
+              width: targetWidth
             });
           }
         } catch (e) {
@@ -115,7 +117,7 @@ export default function LoginPage() {
         </div>
 
         {/* Card Container */}
-        <div className="glass-card" style={{ padding: '2rem' }}>
+        <div className="glass-card" style={{ padding: '1.5rem 1.25rem' }}>
           {/* Role Tabs */}
           <div
             style={{
@@ -124,7 +126,8 @@ export default function LoginPage() {
               padding: '0.25rem',
               borderRadius: 'var(--radius-md)',
               marginBottom: '1.5rem',
-              border: '1px solid var(--border-color)'
+              border: '1px solid var(--border-color)',
+              gap: '0.25rem'
             }}
           >
             <button
@@ -132,21 +135,22 @@ export default function LoginPage() {
               onClick={() => handleTabChange('student')}
               style={{
                 flex: 1,
-                padding: '0.65rem',
+                padding: '0.65rem 0.4rem',
+                minHeight: '44px',
                 borderRadius: 'var(--radius-sm)',
                 fontWeight: 600,
-                fontSize: '0.9rem',
+                fontSize: '0.85rem',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '0.5rem',
+                gap: '0.4rem',
                 background: activeRoleTab === 'student' ? 'var(--primary)' : 'transparent',
                 color: activeRoleTab === 'student' ? '#fff' : 'var(--text-muted)',
                 transition: 'all 0.2s ease'
               }}
             >
               <UserCheck size={18} />
-              Student Portal (OAuth)
+              <span>Student Portal</span>
             </button>
 
             <button
@@ -154,21 +158,22 @@ export default function LoginPage() {
               onClick={() => handleTabChange('admin')}
               style={{
                 flex: 1,
-                padding: '0.65rem',
+                padding: '0.65rem 0.4rem',
+                minHeight: '44px',
                 borderRadius: 'var(--radius-sm)',
                 fontWeight: 600,
-                fontSize: '0.9rem',
+                fontSize: '0.85rem',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '0.5rem',
+                gap: '0.4rem',
                 background: activeRoleTab === 'admin' ? 'var(--warning)' : 'transparent',
                 color: activeRoleTab === 'admin' ? '#0f172a' : 'var(--text-muted)',
                 transition: 'all 0.2s ease'
               }}
             >
               <Shield size={18} />
-              Admin Portal
+              <span>Admin Portal</span>
             </button>
           </div>
 

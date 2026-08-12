@@ -60,11 +60,11 @@ export default function StudentDashboard() {
   return (
     <div className="container main-content">
       {/* Page Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 style={{ fontSize: '1.8rem', fontWeight: 800 }}>Welcome back, {student.name}!</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-            Roll No: <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>{student.roll_no}</span> | Department: {student.department}
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginTop: '0.2rem' }}>
+            Roll No: <span style={{ color: 'var(--text-main)', fontWeight: 600 }}>{student.roll_no}</span> | Dept: {student.department}
           </p>
         </div>
         <button className="btn-secondary" onClick={fetchDashboard}>
@@ -186,22 +186,22 @@ export default function StudentDashboard() {
           {/* Student Profile Overview */}
           <div className="glass-card" style={{ padding: '1.5rem' }}>
             <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '1rem' }}>Student Profile Details</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem', fontSize: '0.9rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', fontSize: '0.9rem' }}>
               <div>
                 <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.8rem' }}>Full Name</span>
-                <strong style={{ color: 'var(--text-main)' }}>{student.name}</strong>
+                <strong style={{ color: 'var(--text-main)', wordBreak: 'break-word' }}>{student.name}</strong>
               </div>
               <div>
                 <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.8rem' }}>Roll Number</span>
-                <strong style={{ color: 'var(--text-main)' }}>{student.roll_no}</strong>
+                <strong style={{ color: 'var(--text-main)', wordBreak: 'break-word' }}>{student.roll_no}</strong>
               </div>
               <div>
                 <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.8rem' }}>Email Address</span>
-                <strong style={{ color: 'var(--text-main)' }}>{student.email}</strong>
+                <strong style={{ color: 'var(--text-main)', wordBreak: 'break-word' }}>{student.email}</strong>
               </div>
               <div>
                 <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.8rem' }}>Department</span>
-                <strong style={{ color: 'var(--text-main)' }}>{student.department}</strong>
+                <strong style={{ color: 'var(--text-main)', wordBreak: 'break-word' }}>{student.department}</strong>
               </div>
             </div>
           </div>

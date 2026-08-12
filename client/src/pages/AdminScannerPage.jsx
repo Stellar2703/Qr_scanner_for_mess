@@ -206,7 +206,7 @@ export default function AdminScannerPage() {
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <button
             className="btn-secondary"
             onClick={() => setSoundEnabled(!soundEnabled)}
@@ -223,7 +223,7 @@ export default function AdminScannerPage() {
         {/* Left Column: Scanner Station & Inputs */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div className="glass-card" style={{ padding: '1.5rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
               <h2 style={{ fontSize: '1.1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <ScanLine className="text-primary scanner-active" />
                 <span>Live Camera Viewport</span>
@@ -232,7 +232,7 @@ export default function AdminScannerPage() {
               <button
                 className={cameraActive ? 'btn-secondary' : 'btn-primary'}
                 onClick={() => setCameraActive(!cameraActive)}
-                style={{ fontSize: '0.82rem', padding: '0.4rem 0.8rem' }}
+                style={{ fontSize: '0.82rem', padding: '0.4rem 0.8rem', minHeight: '38px' }}
               >
                 <Camera size={16} />
                 <span>{cameraActive ? 'Pause Camera' : 'Start Camera'}</span>
@@ -275,16 +275,16 @@ export default function AdminScannerPage() {
             <form onSubmit={handleManualSubmit}>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label style={{ fontSize: '0.85rem' }}>Manual Entry / Barcode Gun Input</label>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                   <input
                     type="text"
                     className="input-control"
-                    style={{ flex: 1, padding: '0.6rem 0.8rem', fontSize: '0.9rem' }}
+                    style={{ flex: '1 1 200px', padding: '0.6rem 0.8rem', fontSize: '0.9rem' }}
                     placeholder="Enter Student Roll No or Permanent QR Payload"
                     value={manualToken}
                     onChange={(e) => setManualToken(e.target.value)}
                   />
-                  <button type="submit" className="btn-primary" disabled={loading || !manualToken.trim()} style={{ padding: '0.6rem 1rem' }}>
+                  <button type="submit" className="btn-primary" disabled={loading || !manualToken.trim()} style={{ padding: '0.6rem 1rem', flex: '1 1 90px' }}>
                     {loading ? <RefreshCw size={16} className="spinner" /> : 'Verify'}
                   </button>
                 </div>

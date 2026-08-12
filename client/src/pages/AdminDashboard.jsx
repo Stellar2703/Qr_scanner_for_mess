@@ -144,8 +144,8 @@ export default function AdminDashboard({ onNavigate }) {
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(15, 23, 42, 0.6)', padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+        <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(15, 23, 42, 0.6)', padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', minHeight: '44px' }}>
             <Calendar size={16} className="text-muted" />
             <input
               type="date"
@@ -376,7 +376,7 @@ export default function AdminDashboard({ onNavigate }) {
                 }
 
                 return (
-                  <div style={{ overflowX: 'auto' }}>
+                  <div className="table-responsive">
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
                       <thead>
                         <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -468,33 +468,8 @@ export default function AdminDashboard({ onNavigate }) {
 
       {/* Add Student Modal */}
       {showAddModal && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(15, 23, 42, 0.8)',
-            backdropFilter: 'blur(6px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000,
-            padding: '1rem'
-          }}
-        >
-          <div
-            className="glass-card"
-            style={{
-              width: '100%',
-              maxWidth: '500px',
-              padding: '2rem',
-              borderRadius: 'var(--radius-lg)',
-              border: '1px solid var(--border-color)',
-              position: 'relative'
-            }}
-          >
+        <div className="modal-overlay">
+          <div className="glass-card modal-card" style={{ padding: '1.5rem', position: 'relative' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <div style={{ padding: '0.6rem', borderRadius: '50%', background: 'rgba(16, 185, 129, 0.2)', color: '#34d399' }}>

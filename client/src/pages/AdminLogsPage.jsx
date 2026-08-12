@@ -71,15 +71,17 @@ export default function AdminLogsPage() {
           </p>
         </div>
 
-        <button className="btn-primary" onClick={exportCSV} disabled={filteredLogs.length === 0}>
-          <Download size={18} />
-          <span>Export CSV Report</span>
-        </button>
+        <div className="header-actions">
+          <button className="btn-primary" onClick={exportCSV} disabled={filteredLogs.length === 0}>
+            <Download size={18} />
+            <span>Export CSV Report</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter and Search Bar */}
       <div className="glass-card" style={{ padding: '1.25rem', marginBottom: '1.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-        <div style={{ flex: 1, minWidth: '240px', position: 'relative' }}>
+        <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
           <input
             type="text"
             className="input-control"
@@ -91,29 +93,30 @@ export default function AdminLogsPage() {
           <Search size={18} style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-dim)' }} />
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', flex: '1 1 auto' }}>
           <Calendar size={18} className="text-muted" />
           <input
             type="date"
             className="input-control"
+            style={{ flex: 1 }}
             value={filterDate}
             onChange={(e) => setFilterDate(e.target.value)}
           />
           {filterDate && (
-            <button className="btn-secondary" style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem' }} onClick={() => setFilterDate('')}>
+            <button className="btn-secondary" style={{ padding: '0.5rem 0.75rem', fontSize: '0.8rem', minHeight: '44px' }} onClick={() => setFilterDate('')}>
               Clear Date
             </button>
           )}
         </div>
 
-        <button className="btn-secondary" onClick={fetchLogs}>
+        <button className="btn-secondary" onClick={fetchLogs} style={{ minHeight: '44px' }}>
           <RefreshCw size={16} />
           <span>Refresh</span>
         </button>
       </div>
 
       {/* Table Container */}
-      <div className="glass-card" style={{ padding: '1.5rem', overflowX: 'auto' }}>
+      <div className="glass-card table-responsive" style={{ padding: '1.5rem' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--text-muted)' }}>
             <RefreshCw size={32} className="text-primary spinner" style={{ animation: 'spin 1s linear infinite' }} />
